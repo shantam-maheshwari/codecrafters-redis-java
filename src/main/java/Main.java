@@ -184,7 +184,7 @@ class ClientHandlerThread extends Thread {
             }
             requestBulkStringArrayLength--;
 
-            if (requestBulkString.equals("PX")) {
+            if (requestBulkString.equals("px")) {
               // get length of bulk string
               requestBulkString = in.readLine();
               if (requestBulkString == null) {
