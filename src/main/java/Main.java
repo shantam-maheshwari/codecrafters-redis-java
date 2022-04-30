@@ -163,6 +163,7 @@ class ClientHandlerThread extends Thread {
             if (requestBulkString == null) {
               break;
             }
+            System.out.println("key length: " + requestBulkString);
             requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
 
             // get bulk string (key)
@@ -170,10 +171,12 @@ class ClientHandlerThread extends Thread {
             if (requestBulkString == null) {
               break;
             }
+            System.out.println("key: " + requestBulkString);
             key = requestBulkString;
 
             // get value
             value = dataStore.getOrDefault(key, "(nil)");
+            System.out.println("value: " + value);
 
             // send bulk string
             responseBulkStringLength = value.length();
