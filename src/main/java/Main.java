@@ -65,23 +65,25 @@ class ClientHandlerThread extends Thread {
     String key;
     String value;
 
+    // SET PX
+    long millis;
+    ExpireKeyThread thread;
+
     try {
       in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       out = new PrintWriter(clientSocket.getOutputStream(), true);
 
       while ((requestBulkString = in.readLine()) != null) {
-        System.out.println("request arraylen: " + requestBulkString);
 
         // get length of array of bulk strings
         requestBulkStringArrayLength = Integer.parseInt(requestBulkString.substring(1));
 
-        // for (int i = 0; i < requestBulkStringArrayLength; i++) {
         // get length of bulk string
         requestBulkString = in.readLine();
         if (requestBulkString == null) {
           break;
         }
-        System.out.println("request: " + requestBulkString);
+        requestBulkStringArrayLength--;
         requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
 
         // get bulk string (command)
@@ -89,7 +91,7 @@ class ClientHandlerThread extends Thread {
         if (requestBulkString == null) {
           break;
         }
-        System.out.println("request command: " + requestBulkString);
+        requestBulkStringArrayLength--;
 
         // PING
         if (requestBulkString.equals("ping")) {
@@ -106,7 +108,7 @@ class ClientHandlerThread extends Thread {
           if (requestBulkString == null) {
             break;
           }
-          System.out.println("request: " + requestBulkString);
+          requestBulkStringArrayLength--;
           requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
 
           // get bulk string (message)
@@ -114,7 +116,7 @@ class ClientHandlerThread extends Thread {
           if (requestBulkString == null) {
             break;
           }
-          System.out.println("request: " + requestBulkString);
+          requestBulkStringArrayLength--;
 
           // send bulk string
           responseBulkStringLength = requestBulkStringLength;
@@ -130,7 +132,7 @@ class ClientHandlerThread extends Thread {
           if (requestBulkString == null) {
             break;
           }
-          System.out.println("request: " + requestBulkString);
+          requestBulkStringArrayLength--;
           requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
 
           // get bulk string (key)
@@ -138,7 +140,7 @@ class ClientHandlerThread extends Thread {
           if (requestBulkString == null) {
             break;
           }
-          System.out.println("request: " + requestBulkString);
+          requestBulkStringArrayLength--;
           key = requestBulkString;
 
           // get length of bulk string
@@ -146,7 +148,7 @@ class ClientHandlerThread extends Thread {
           if (requestBulkString == null) {
             break;
           }
-          System.out.println("request: " + requestBulkString);
+          requestBulkStringArrayLength--;
           requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
 
           // get bulk string (value)
@@ -154,7 +156,7 @@ class ClientHandlerThread extends Thread {
           if (requestBulkString == null) {
             break;
           }
-          System.out.println("request: " + requestBulkString);
+          requestBulkStringArrayLength--;
           value = requestBulkString;
 
           // set key, value
@@ -164,6 +166,45 @@ class ClientHandlerThread extends Thread {
           responseSimpleString = "+OK\r\n";
           out.print(responseSimpleString);
           out.flush();
+
+          // SET PX
+          if (requestBulkStringArrayLength > 0) {
+            // get length of bulk string
+            requestBulkString = in.readLine();
+            if (requestBulkString == null) {
+              break;
+            }
+            requestBulkStringArrayLength--;
+            requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
+
+            // get bulk string (option)
+            requestBulkString = in.readLine();
+            if (requestBulkString == null) {
+              break;
+            }
+            requestBulkStringArrayLength--;
+
+            if (requestBulkString.equals("PX")) {
+              // get length of bulk string
+              requestBulkString = in.readLine();
+              if (requestBulkString == null) {
+                break;
+              }
+              requestBulkStringArrayLength--;
+              requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
+
+              // get bulk string (milliseconds)
+              requestBulkString = in.readLine();
+              if (requestBulkString == null) {
+                break;
+              }
+              requestBulkStringArrayLength--;
+              millis = Long.parseLong(requestBulkString);
+
+              thread = new ExpireKeyThread(key, millis, dataStore);
+              thread.start();
+            }
+          }
         }
 
         // GET
@@ -173,7 +214,7 @@ class ClientHandlerThread extends Thread {
           if (requestBulkString == null) {
             break;
           }
-          System.out.println("request: " + requestBulkString);
+          requestBulkStringArrayLength--;
           requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
 
           // get bulk string (key)
@@ -181,6 +222,7 @@ class ClientHandlerThread extends Thread {
           if (requestBulkString == null) {
             break;
           }
+          requestBulkStringArrayLength--;
           key = requestBulkString;
 
           // get value
@@ -192,10 +234,30 @@ class ClientHandlerThread extends Thread {
           out.print(responseBulkString);
           out.flush();
         }
-        // }
       }
     } catch (IOException e) {
       System.out.println("IOException: " + e.getMessage());
     }
+  }
+}
+
+class ExpireKeyThread extends Thread {
+  Map<String, String> dataStore;
+  String key;
+  long millis;
+
+  public ExpireKeyThread(String key, long millis, Map<String, String> dataStore) {
+    this.key = key;
+    this.millis = millis;
+    this.dataStore = dataStore;
+  }
+
+  public void run() {
+    try {
+      Thread.sleep(millis);
+    } catch (InterruptedException e) {
+      System.out.println("InterruptedException: " + e.getMessage());
+    }
+    dataStore.remove(key);
   }
 }
