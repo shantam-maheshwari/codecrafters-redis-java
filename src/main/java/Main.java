@@ -75,7 +75,32 @@ class ClientHandlerThread extends Thread {
         // get length of array of bulk strings
         requestBulkStringArrayLength = Integer.parseInt(requestBulkString.substring(1));
 
-        for (int i = 0; i < requestBulkStringArrayLength; i++) {
+        // for (int i = 0; i < requestBulkStringArrayLength; i++) {
+        // get length of bulk string
+        requestBulkString = in.readLine();
+        if (requestBulkString == null) {
+          break;
+        }
+        System.out.println("request: " + requestBulkString);
+        requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
+
+        // get bulk string (command)
+        requestBulkString = in.readLine();
+        if (requestBulkString == null) {
+          break;
+        }
+        System.out.println("request command: " + requestBulkString);
+
+        // PING
+        if (requestBulkString.equals("ping")) {
+          // send simple string
+          responseSimpleString = "+PONG\r\n";
+          out.print(responseSimpleString);
+          out.flush();
+        }
+
+        // ECHO
+        else if (requestBulkString.equals("echo")) {
           // get length of bulk string
           requestBulkString = in.readLine();
           if (requestBulkString == null) {
@@ -84,115 +109,90 @@ class ClientHandlerThread extends Thread {
           System.out.println("request: " + requestBulkString);
           requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
 
-          // get bulk string (command)
+          // get bulk string (message)
           requestBulkString = in.readLine();
           if (requestBulkString == null) {
             break;
           }
-          System.out.println("request command: " + requestBulkString);
+          System.out.println("request: " + requestBulkString);
 
-          // PING
-          if (requestBulkString.equals("ping")) {
-            // send simple string
-            responseSimpleString = "+PONG\r\n";
-            out.print(responseSimpleString);
-            out.flush();
-          }
-
-          // ECHO
-          else if (requestBulkString.equals("echo")) {
-            // get length of bulk string
-            requestBulkString = in.readLine();
-            if (requestBulkString == null) {
-              break;
-            }
-            System.out.println("request: " + requestBulkString);
-            requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
-
-            // get bulk string (message)
-            requestBulkString = in.readLine();
-            if (requestBulkString == null) {
-              break;
-            }
-            System.out.println("request: " + requestBulkString);
-
-            // send bulk string
-            responseBulkStringLength = requestBulkStringLength;
-            responseBulkString = "$" + responseBulkStringLength + "\r\n" + requestBulkString + "\r\n";
-            out.print(responseBulkString);
-            out.flush();
-          }
-
-          // SET
-          else if (requestBulkString.equals("set")) {
-            // get length of bulk string
-            requestBulkString = in.readLine();
-            if (requestBulkString == null) {
-              break;
-            }
-            System.out.println("request: " + requestBulkString);
-            requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
-
-            // get bulk string (key)
-            requestBulkString = in.readLine();
-            if (requestBulkString == null) {
-              break;
-            }
-            System.out.println("request: " + requestBulkString);
-            key = requestBulkString;
-
-            // get length of bulk string
-            requestBulkString = in.readLine();
-            if (requestBulkString == null) {
-              break;
-            }
-            System.out.println("request: " + requestBulkString);
-            requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
-
-            // get bulk string (value)
-            requestBulkString = in.readLine();
-            if (requestBulkString == null) {
-              break;
-            }
-            System.out.println("request: " + requestBulkString);
-            value = requestBulkString;
-
-            // set key, value
-            dataStore.put(key, value);
-
-            // send simple string
-            responseSimpleString = "+OK\r\n";
-            out.print(responseSimpleString);
-            out.flush();
-          }
-
-          // GET
-          else if (requestBulkString.equals("get")) {
-            // get length of bulk string
-            requestBulkString = in.readLine();
-            if (requestBulkString == null) {
-              break;
-            }
-            System.out.println("request: " + requestBulkString);
-            requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
-
-            // get bulk string (key)
-            requestBulkString = in.readLine();
-            if (requestBulkString == null) {
-              break;
-            }
-            key = requestBulkString;
-
-            // get value
-            value = dataStore.getOrDefault(key, "(nil)");
-
-            // send bulk string
-            responseBulkStringLength = value.length();
-            responseBulkString = "$" + responseBulkStringLength + "\r\n" + value + "\r\n";
-            out.print(responseBulkString);
-            out.flush();
-          }
+          // send bulk string
+          responseBulkStringLength = requestBulkStringLength;
+          responseBulkString = "$" + responseBulkStringLength + "\r\n" + requestBulkString + "\r\n";
+          out.print(responseBulkString);
+          out.flush();
         }
+
+        // SET
+        else if (requestBulkString.equals("set")) {
+          // get length of bulk string
+          requestBulkString = in.readLine();
+          if (requestBulkString == null) {
+            break;
+          }
+          System.out.println("request: " + requestBulkString);
+          requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
+
+          // get bulk string (key)
+          requestBulkString = in.readLine();
+          if (requestBulkString == null) {
+            break;
+          }
+          System.out.println("request: " + requestBulkString);
+          key = requestBulkString;
+
+          // get length of bulk string
+          requestBulkString = in.readLine();
+          if (requestBulkString == null) {
+            break;
+          }
+          System.out.println("request: " + requestBulkString);
+          requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
+
+          // get bulk string (value)
+          requestBulkString = in.readLine();
+          if (requestBulkString == null) {
+            break;
+          }
+          System.out.println("request: " + requestBulkString);
+          value = requestBulkString;
+
+          // set key, value
+          dataStore.put(key, value);
+
+          // send simple string
+          responseSimpleString = "+OK\r\n";
+          out.print(responseSimpleString);
+          out.flush();
+        }
+
+        // GET
+        else if (requestBulkString.equals("get")) {
+          // get length of bulk string
+          requestBulkString = in.readLine();
+          if (requestBulkString == null) {
+            break;
+          }
+          System.out.println("request: " + requestBulkString);
+          requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
+
+          // get bulk string (key)
+          requestBulkString = in.readLine();
+          if (requestBulkString == null) {
+            break;
+          }
+          key = requestBulkString;
+
+          // get value
+          value = dataStore.getOrDefault(key, "(nil)");
+
+          // send bulk string
+          responseBulkStringLength = value.length();
+          responseBulkString = "$" + responseBulkStringLength + "\r\n" + value + "\r\n";
+          out.print(responseBulkString);
+          out.flush();
+        }
+        // }
       }
     } catch (IOException e) {
       System.out.println("IOException: " + e.getMessage());
