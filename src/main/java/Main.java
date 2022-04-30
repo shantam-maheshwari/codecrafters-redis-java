@@ -7,11 +7,7 @@ import java.net.Socket;
 
 public class Main {
   public static void main(String[] args) {
-    // You can use print statements as follows for debugging, they'll be visible
-    // when running tests.
-    System.out.println("Logs from your program will appear here!");
-
-    // Uncomment this block to pass the first stage
+    int port = 6379;
     ServerSocket serverSocket = null;
     Socket clientSocket = null;
     PrintWriter out;
@@ -19,11 +15,9 @@ public class Main {
     String request;
     String response;
 
-    int port = 6379;
     try {
       serverSocket = new ServerSocket(port);
       serverSocket.setReuseAddress(true);
-      // Wait for connection from client.
       clientSocket = serverSocket.accept();
 
       out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -31,6 +25,7 @@ public class Main {
 
       while ((request = in.readLine()) != null) {
         System.out.println("request: " + request);
+
         if (request.equals("ping")) {
           response = "+PONG\r\n";
           out.print(response);
