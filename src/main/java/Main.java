@@ -178,6 +178,7 @@ class ClientHandlerThread extends Thread {
             // send bulk string
             responseBulkStringLength = value.length();
             responseBulkString = "$" + responseBulkStringLength + "\r\n" + value + "\r\n";
+            System.out.println(responseBulkString);
             out.print(responseBulkString);
             out.flush();
           }
