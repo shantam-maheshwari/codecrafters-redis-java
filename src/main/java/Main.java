@@ -181,17 +181,14 @@ class ClientHandlerThread extends Thread {
             if (requestBulkString == null) {
               break;
             }
-            System.out.println("request: " + requestBulkString);
             key = requestBulkString;
 
             // get value
             value = dataStore.getOrDefault(key, "(nil)");
-            System.out.println("value: " + value);
 
             // send bulk string
             responseBulkStringLength = value.length();
             responseBulkString = "$" + responseBulkStringLength + "\r\n" + value + "\r\n";
-            System.out.println(responseBulkString);
             out.print(responseBulkString);
             out.flush();
           }
