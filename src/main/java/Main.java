@@ -52,8 +52,6 @@ class ClientHandlerThread extends Thread {
     String responseSimpleString;
 
     // ECHO
-    String responseBulkStringArray;
-    int responseBulkStringArrayLength;
     String responseBulkString;
     int responseBulkStringLength;
 
@@ -102,13 +100,10 @@ class ClientHandlerThread extends Thread {
               break;
             }
 
-            // send array of bulk strings
-            responseBulkStringArrayLength = 1;
-            responseBulkString = requestBulkString;
+            // send bulk string
             responseBulkStringLength = requestBulkStringLength;
-            responseBulkStringArray = "*" + responseBulkStringArrayLength + "\r\n$" + responseBulkStringLength + "\r\n"
-                + responseBulkString + "\r\n";
-            out.print(responseBulkStringArray);
+            responseBulkString = "$" + responseBulkStringLength + "\r\n" + requestBulkString + "\r\n";
+            out.print(responseBulkString);
             out.flush();
           }
         }
