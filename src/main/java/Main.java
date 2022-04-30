@@ -31,8 +31,10 @@ public class Main {
 
       while ((request = in.readLine()) != null) {
         System.out.println("request: " + request);
-        response = "+PONG\r\n";
-        out.print(response);
+        if (request.equals("ping")) {
+          response = "+PONG\r\n";
+          out.print(response);
+        }
       }
 
     } catch (IOException e) {
