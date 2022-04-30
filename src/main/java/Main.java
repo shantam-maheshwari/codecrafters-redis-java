@@ -89,7 +89,7 @@ class ClientHandlerThread extends Thread {
           if (requestBulkString == null) {
             break;
           }
-          System.out.println("request: " + requestBulkString);
+          System.out.println("request command: " + requestBulkString);
 
           // PING
           if (requestBulkString.equals("ping")) {
