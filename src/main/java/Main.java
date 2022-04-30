@@ -70,7 +70,7 @@ class ClientHandlerThread extends Thread {
       out = new PrintWriter(clientSocket.getOutputStream(), true);
 
       while ((requestBulkString = in.readLine()) != null) {
-        System.out.println("request: " + requestBulkString);
+        System.out.println("request arraylen: " + requestBulkString);
 
         // get length of array of bulk strings
         requestBulkStringArrayLength = Integer.parseInt(requestBulkString.substring(1));
