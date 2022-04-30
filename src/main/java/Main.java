@@ -10,29 +10,15 @@ public class Main {
     int port = 6379;
     ServerSocket serverSocket = null;
     Socket clientSocket = null;
-    PrintWriter out;
-    BufferedReader in;
-    String request;
-    String response;
+    ClientHandlerThread thread;
 
     try {
       serverSocket = new ServerSocket(port);
-      serverSocket.setReuseAddress(true);
-      clientSocket = serverSocket.accept();
-
-      out = new PrintWriter(clientSocket.getOutputStream(), true);
-      in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-      while ((request = in.readLine()) != null) {
-        System.out.println("request: " + request);
-
-        if (request.equals("ping")) {
-          response = "+PONG\r\n";
-          out.print(response);
-          out.flush();
-        }
+      while (true) {
+        clientSocket = serverSocket.accept();
+        thread = new ClientHandlerThread(clientSocket);
+        thread.start();
       }
-
     } catch (IOException e) {
       System.out.println("IOException: " + e.getMessage());
     } finally {
@@ -43,6 +29,39 @@ public class Main {
       } catch (IOException e) {
         System.out.println("IOException: " + e.getMessage());
       }
+    }
+  }
+}
+
+class ClientHandlerThread extends Thread {
+  private Socket clientSocket;
+
+  public ClientHandlerThread(Socket clientSocket) {
+    this.clientSocket = clientSocket;
+  }
+
+  public void run() {
+    BufferedReader in;
+    PrintWriter out;
+    String request;
+    String response;
+
+    try {
+      in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+      out = new PrintWriter(clientSocket.getOutputStream(), true);
+
+      while ((request = in.readLine()) != null) {
+        System.out.println("request: " + request);
+
+        if (request.equals("ping")) {
+          response = "+PONG\r\n";
+          out.print(response);
+          out.flush();
+          System.out.println("response: " + response);
+        }
+      }
+    } catch (IOException e) {
+      System.out.println("IOException: " + e.getMessage());
     }
   }
 }
