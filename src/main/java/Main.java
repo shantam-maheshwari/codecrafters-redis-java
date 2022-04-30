@@ -221,7 +221,7 @@ class ClientHandlerThread extends Thread {
           key = requestBulkString;
 
           // get value
-          value = dataStore.getOrDefault(key, "(nil)");
+          value = dataStore.getOrDefault(key, "");
 
           // send bulk string
           responseBulkStringLength = value.length();
