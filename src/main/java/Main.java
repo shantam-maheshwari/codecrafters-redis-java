@@ -43,21 +43,64 @@ class ClientHandlerThread extends Thread {
   public void run() {
     BufferedReader in;
     PrintWriter out;
-    String request;
-    String response;
+
+    int requestBulkStringArrayLength;
+    String requestBulkString;
+    int requestBulkStringLength;
+
+    String responseBulkStringArray;
+    int responseBulkStringArrayLength;
+    String responseSimpleString;
+    String responseBulkString;
+    int responseBulkStringLength;
 
     try {
       in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       out = new PrintWriter(clientSocket.getOutputStream(), true);
 
-      while ((request = in.readLine()) != null) {
-        System.out.println("request: " + request);
+      while ((requestBulkString = in.readLine()) != null) {
+        // get length of array of bulk strings
+        requestBulkStringArrayLength = Integer.parseInt(requestBulkString.substring(1));
 
-        if (request.equals("ping")) {
-          response = "+PONG\r\n";
-          out.print(response);
-          out.flush();
-          System.out.println("response: " + response);
+        for (int i = 0; i < requestBulkStringArrayLength; i++) {
+          // get length of bulk string
+          requestBulkString = in.readLine();
+          if (requestBulkString == null) {
+            break;
+          }
+          requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
+
+          // get bulk string (command)
+          requestBulkString = in.readLine();
+          if (requestBulkString == null) {
+            break;
+          }
+
+          // PING
+          if (requestBulkString.equals("ping")) {
+            // send simple string
+            responseSimpleString = "+PONG\r\n";
+            out.print(responseSimpleString);
+            out.flush();
+          }
+
+          // ECHO
+          else if (requestBulkString.equals("ECHO")) {
+            // get bulk string (message)
+            requestBulkString = in.readLine();
+            if (requestBulkString == null) {
+              break;
+            }
+
+            // send array of bulk strings
+            responseBulkStringArrayLength = 1;
+            responseBulkString = requestBulkString;
+            responseBulkStringLength = requestBulkStringLength;
+            responseBulkStringArray = "*" + responseBulkStringArrayLength + "\r\n$" + responseBulkStringLength + "\r\n"
+                + responseBulkString + "\r\n";
+            out.print(responseBulkStringArray);
+            out.flush();
+          }
         }
       }
     } catch (IOException e) {
