@@ -70,6 +70,8 @@ class ClientHandlerThread extends Thread {
       out = new PrintWriter(clientSocket.getOutputStream(), true);
 
       while ((requestBulkString = in.readLine()) != null) {
+        System.out.println("request: " + requestBulkString);
+
         // get length of array of bulk strings
         requestBulkStringArrayLength = Integer.parseInt(requestBulkString.substring(1));
 
@@ -79,6 +81,7 @@ class ClientHandlerThread extends Thread {
           if (requestBulkString == null) {
             break;
           }
+          System.out.println("request: " + requestBulkString);
           requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
 
           // get bulk string (command)
