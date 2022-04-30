@@ -48,9 +48,12 @@ class ClientHandlerThread extends Thread {
     String requestBulkString;
     int requestBulkStringLength;
 
+    // PING
+    String responseSimpleString;
+
+    // ECHO
     String responseBulkStringArray;
     int responseBulkStringArrayLength;
-    String responseSimpleString;
     String responseBulkString;
     int responseBulkStringLength;
 
@@ -86,6 +89,13 @@ class ClientHandlerThread extends Thread {
 
           // ECHO
           else if (requestBulkString.equals("echo")) {
+            // get length of bulk string
+            requestBulkString = in.readLine();
+            if (requestBulkString == null) {
+              break;
+            }
+            requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
+
             // get bulk string (message)
             requestBulkString = in.readLine();
             if (requestBulkString == null) {
