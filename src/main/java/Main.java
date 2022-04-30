@@ -85,7 +85,7 @@ class ClientHandlerThread extends Thread {
           }
 
           // ECHO
-          else if (requestBulkString.equals("ECHO")) {
+          else if (requestBulkString.equals("echo")) {
             // get bulk string (message)
             requestBulkString = in.readLine();
             if (requestBulkString == null) {
