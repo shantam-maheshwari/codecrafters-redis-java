@@ -89,6 +89,7 @@ class ClientHandlerThread extends Thread {
           if (requestBulkString == null) {
             break;
           }
+          System.out.println("request: " + requestBulkString);
 
           // PING
           if (requestBulkString.equals("ping")) {
@@ -105,6 +106,7 @@ class ClientHandlerThread extends Thread {
             if (requestBulkString == null) {
               break;
             }
+            System.out.println("request: " + requestBulkString);
             requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
 
             // get bulk string (message)
@@ -112,6 +114,7 @@ class ClientHandlerThread extends Thread {
             if (requestBulkString == null) {
               break;
             }
+            System.out.println("request: " + requestBulkString);
 
             // send bulk string
             responseBulkStringLength = requestBulkStringLength;
@@ -127,6 +130,7 @@ class ClientHandlerThread extends Thread {
             if (requestBulkString == null) {
               break;
             }
+            System.out.println("request: " + requestBulkString);
             requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
 
             // get bulk string (key)
@@ -134,6 +138,7 @@ class ClientHandlerThread extends Thread {
             if (requestBulkString == null) {
               break;
             }
+            System.out.println("request: " + requestBulkString);
             key = requestBulkString;
 
             // get length of bulk string
@@ -141,6 +146,7 @@ class ClientHandlerThread extends Thread {
             if (requestBulkString == null) {
               break;
             }
+            System.out.println("request: " + requestBulkString);
             requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
 
             // get bulk string (value)
@@ -148,6 +154,7 @@ class ClientHandlerThread extends Thread {
             if (requestBulkString == null) {
               break;
             }
+            System.out.println("request: " + requestBulkString);
             value = requestBulkString;
 
             // set key, value
@@ -166,7 +173,7 @@ class ClientHandlerThread extends Thread {
             if (requestBulkString == null) {
               break;
             }
-            System.out.println("key length: " + requestBulkString);
+            System.out.println("request: " + requestBulkString);
             requestBulkStringLength = Integer.parseInt(requestBulkString.substring(1));
 
             // get bulk string (key)
@@ -174,7 +181,7 @@ class ClientHandlerThread extends Thread {
             if (requestBulkString == null) {
               break;
             }
-            System.out.println("key: " + requestBulkString);
+            System.out.println("request: " + requestBulkString);
             key = requestBulkString;
 
             // get value
