@@ -30,10 +30,9 @@ public class Main {
       in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
       request = in.readLine();
-      if (request.equals("PING")) {
-        response = "+PONG\r\n";
-        out.println(response);
-      }
+      response = "+PONG\r\n";
+      out.print(response);
+
     } catch (IOException e) {
       System.out.println("IOException: " + e.getMessage());
     } finally {
