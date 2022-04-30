@@ -221,10 +221,15 @@ class ClientHandlerThread extends Thread {
           key = requestBulkString;
 
           // get value
-          value = dataStore.getOrDefault(key, "");
+          if (dataStore.containsKey(key)) {
+            value = dataStore.get(key);
+            responseBulkStringLength = value.length();
+          } else {
+            value = "";
+            responseBulkStringLength = -1;
+          }
 
           // send bulk string
-          responseBulkStringLength = value.length();
           responseBulkString = "$" + responseBulkStringLength + "\r\n" + value + "\r\n";
           out.print(responseBulkString);
           out.flush();
