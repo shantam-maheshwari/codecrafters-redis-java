@@ -90,7 +90,7 @@ class ClientHandlerThread extends Thread {
       responseBulkStringLength = -1;
     }
 
-    String responseBulkString = "$" + responseBulkStringData.length() + "\r\n" + responseBulkStringData + "\r\n";
+    String responseBulkString = "$" + responseBulkStringLength + "\r\n" + responseBulkStringData + "\r\n";
     out.print(responseBulkString);
     out.flush();
   }
