@@ -84,6 +84,12 @@ class ClientHandlerThread extends Thread {
   }
 
   private void writeResponseBulkString(String responseBulkStringData, PrintWriter out) {
+    // handle null bulk strings
+    int responseBulkStringLength = responseBulkStringData.length();
+    if (responseBulkStringLength == 0) {
+      responseBulkStringLength = -1;
+    }
+
     String responseBulkString = "$" + responseBulkStringData.length() + "\r\n" + responseBulkStringData + "\r\n";
     out.print(responseBulkString);
     out.flush();
