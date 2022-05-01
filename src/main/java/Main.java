@@ -40,13 +40,14 @@ public class Main {
 class ClientHandlerThread extends Thread {
   private Socket clientSocket;
   Map<String, String> dataStore;
+  Integer requestBulkStringArrayLength;
 
   public ClientHandlerThread(Socket clientSocket, Map<String, String> dataStore) {
     this.clientSocket = clientSocket;
     this.dataStore = dataStore;
   }
 
-  private String readRequestBulkString(BufferedReader in, Integer requestBulkStringArrayLength) {
+  private String readRequestBulkString(BufferedReader in) {
     String requestBulkString = null;
     try {
       requestBulkString = in.readLine();
@@ -81,7 +82,6 @@ class ClientHandlerThread extends Thread {
     BufferedReader in;
     PrintWriter out;
 
-    Integer requestBulkStringArrayLength;
     String requestBulkString;
     int requestBulkStringLength;
 
@@ -113,7 +113,7 @@ class ClientHandlerThread extends Thread {
         requestBulkStringLength = readRequestBulkStringLength(in);
 
         // get bulk string (command)
-        requestBulkString = readRequestBulkString(in, requestBulkStringArrayLength);
+        requestBulkString = readRequestBulkString(in);
 
         // PING
         if (requestBulkString.equals("ping")) {
@@ -129,7 +129,7 @@ class ClientHandlerThread extends Thread {
           requestBulkStringLength = readRequestBulkStringLength(in);
 
           // get bulk string (message)
-          requestBulkString = readRequestBulkString(in, requestBulkStringArrayLength);
+          requestBulkString = readRequestBulkString(in);
 
           // send bulk string
           responseBulkStringLength = requestBulkStringLength;
@@ -144,14 +144,14 @@ class ClientHandlerThread extends Thread {
           requestBulkStringLength = readRequestBulkStringLength(in);
 
           // get bulk string (key)
-          requestBulkString = readRequestBulkString(in, requestBulkStringArrayLength);
+          requestBulkString = readRequestBulkString(in);
           key = requestBulkString;
 
           // get length of bulk string
           requestBulkStringLength = readRequestBulkStringLength(in);
 
           // get bulk string (value)
-          requestBulkString = readRequestBulkString(in, requestBulkStringArrayLength);
+          requestBulkString = readRequestBulkString(in);
           value = requestBulkString;
 
           // set key, value
@@ -169,14 +169,14 @@ class ClientHandlerThread extends Thread {
             requestBulkStringLength = readRequestBulkStringLength(in);
 
             // get bulk string (option)
-            requestBulkString = readRequestBulkString(in, requestBulkStringArrayLength);
+            requestBulkString = readRequestBulkString(in);
 
             if (requestBulkString.equals("px")) {
               // get length of bulk string
               requestBulkStringLength = readRequestBulkStringLength(in);
 
               // get bulk string (milliseconds)
-              requestBulkString = readRequestBulkString(in, requestBulkStringArrayLength);
+              requestBulkString = readRequestBulkString(in);
               millis = Long.parseLong(requestBulkString);
 
               thread = new ExpireKeyThread(key, millis, dataStore);
@@ -191,7 +191,7 @@ class ClientHandlerThread extends Thread {
           requestBulkStringLength = readRequestBulkStringLength(in);
 
           // get bulk string (key)
-          requestBulkString = readRequestBulkString(in, requestBulkStringArrayLength);
+          requestBulkString = readRequestBulkString(in);
           key = requestBulkString;
 
           // get value
