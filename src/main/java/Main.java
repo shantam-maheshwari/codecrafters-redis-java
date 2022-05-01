@@ -39,15 +39,20 @@ public class Main {
 
 class ClientHandlerThread extends Thread {
   private Socket clientSocket;
-  Map<String, String> dataStore;
-  Integer requestBulkStringArrayLength;
+  private Map<String, String> dataStore;
+  private Integer requestBulkStringArrayLength;
 
   public ClientHandlerThread(Socket clientSocket, Map<String, String> dataStore) {
     this.clientSocket = clientSocket;
     this.dataStore = dataStore;
   }
 
-  private String readRequestBulkString(BufferedReader in) {
+  private String readRequestBulkStringData(BufferedReader in) {
+    int ignore = readRequestBulkStringLength(in);
+    return _readRequestBulkStringData(in);
+  }
+
+  private String _readRequestBulkStringData(BufferedReader in) {
     String requestBulkString = null;
     try {
       requestBulkString = in.readLine();
@@ -78,19 +83,29 @@ class ClientHandlerThread extends Thread {
     return Integer.parseInt(requestBulkString.substring(1));
   }
 
+  private void writeResponseBulkString(String responseBulkStringData, PrintWriter out) {
+    String responseBulkString = "$" + responseBulkStringData.length() + "\r\n" + responseBulkStringData + "\r\n";
+    out.print(responseBulkString);
+    out.flush();
+  }
+
+  private void writeResponseSimpleString(String responseSimpleStringData, PrintWriter out) {
+    String responseSimpleString = "+" + responseSimpleStringData + "\r\n";
+    out.print(responseSimpleString);
+    out.flush();
+  }
+
   public void run() {
     BufferedReader in;
     PrintWriter out;
 
-    String requestBulkString;
-    int requestBulkStringLength;
+    String requestBulkStringData;
 
     // PING, SET
-    String responseSimpleString;
+    String responseSimpleStringData;
 
     // ECHO, GET
-    String responseBulkString;
-    int responseBulkStringLength;
+    String responseBulkStringData;
 
     // SET, GET
     String key;
@@ -104,80 +119,60 @@ class ClientHandlerThread extends Thread {
       in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       out = new PrintWriter(clientSocket.getOutputStream(), true);
 
-      while ((requestBulkString = in.readLine()) != null) {
+      while ((requestBulkStringData = in.readLine()) != null) {
 
         // get length of array of bulk strings
-        requestBulkStringArrayLength = Integer.parseInt(requestBulkString.substring(1));
+        requestBulkStringArrayLength = Integer.parseInt(requestBulkStringData.substring(1));
 
-        // get length of bulk string
-        requestBulkStringLength = readRequestBulkStringLength(in);
-
-        // get bulk string (command)
-        requestBulkString = readRequestBulkString(in);
+        // get command
+        requestBulkStringData = readRequestBulkStringData(in);
 
         // PING
-        if (requestBulkString.equals("ping")) {
+        if (requestBulkStringData.equals("ping")) {
           // send simple string
-          responseSimpleString = "+PONG\r\n";
-          out.print(responseSimpleString);
-          out.flush();
+          responseSimpleStringData = "+PONG\r\n";
+          writeResponseSimpleString(responseSimpleStringData, out);
         }
 
         // ECHO
-        else if (requestBulkString.equals("echo")) {
-          // get length of bulk string
-          requestBulkStringLength = readRequestBulkStringLength(in);
+        else if (requestBulkStringData.equals("echo")) {
 
-          // get bulk string (message)
-          requestBulkString = readRequestBulkString(in);
+          // get message
+          requestBulkStringData = readRequestBulkStringData(in);
 
           // send bulk string
-          responseBulkStringLength = requestBulkStringLength;
-          responseBulkString = "$" + responseBulkStringLength + "\r\n" + requestBulkString + "\r\n";
-          out.print(responseBulkString);
-          out.flush();
+          responseBulkStringData = requestBulkStringData;
+          writeResponseBulkString(responseBulkStringData, out);
         }
 
         // SET
-        else if (requestBulkString.equals("set")) {
-          // get length of bulk string
-          requestBulkStringLength = readRequestBulkStringLength(in);
+        else if (requestBulkStringData.equals("set")) {
 
-          // get bulk string (key)
-          requestBulkString = readRequestBulkString(in);
-          key = requestBulkString;
+          // get key
+          requestBulkStringData = readRequestBulkStringData(in);
+          key = requestBulkStringData;
 
-          // get length of bulk string
-          requestBulkStringLength = readRequestBulkStringLength(in);
-
-          // get bulk string (value)
-          requestBulkString = readRequestBulkString(in);
-          value = requestBulkString;
+          // get value
+          requestBulkStringData = readRequestBulkStringData(in);
+          value = requestBulkStringData;
 
           // set key, value
           dataStore.put(key, value);
 
           // send simple string
-          responseSimpleString = "+OK\r\n";
-          out.print(responseSimpleString);
-          out.flush();
+          responseSimpleStringData = "+OK\r\n";
+          writeResponseSimpleString(responseSimpleStringData, out);
 
           // SET PX
           if (requestBulkStringArrayLength > 0) {
 
-            // get length of bulk string
-            requestBulkStringLength = readRequestBulkStringLength(in);
+            // get option
+            requestBulkStringData = readRequestBulkStringData(in);
 
-            // get bulk string (option)
-            requestBulkString = readRequestBulkString(in);
-
-            if (requestBulkString.equals("px")) {
-              // get length of bulk string
-              requestBulkStringLength = readRequestBulkStringLength(in);
-
-              // get bulk string (milliseconds)
-              requestBulkString = readRequestBulkString(in);
-              millis = Long.parseLong(requestBulkString);
+            if (requestBulkStringData.equals("px")) {
+              // get milliseconds
+              requestBulkStringData = readRequestBulkStringData(in);
+              millis = Long.parseLong(requestBulkStringData);
 
               thread = new ExpireKeyThread(key, millis, dataStore);
               thread.start();
@@ -186,27 +181,17 @@ class ClientHandlerThread extends Thread {
         }
 
         // GET
-        else if (requestBulkString.equals("get")) {
-          // get length of bulk string
-          requestBulkStringLength = readRequestBulkStringLength(in);
+        else if (requestBulkStringData.equals("get")) {
 
-          // get bulk string (key)
-          requestBulkString = readRequestBulkString(in);
-          key = requestBulkString;
+          // get key
+          requestBulkStringData = readRequestBulkStringData(in);
+          key = requestBulkStringData;
 
           // get value
-          if (dataStore.containsKey(key)) {
-            value = dataStore.get(key);
-            responseBulkStringLength = value.length();
-          } else {
-            value = "";
-            responseBulkStringLength = -1;
-          }
+          responseBulkStringData = dataStore.getOrDefault(key, "");
 
           // send bulk string
-          responseBulkString = "$" + responseBulkStringLength + "\r\n" + value + "\r\n";
-          out.print(responseBulkString);
-          out.flush();
+          writeResponseBulkString(responseBulkStringData, out);
         }
       }
     } catch (IOException e) {
@@ -216,9 +201,9 @@ class ClientHandlerThread extends Thread {
 }
 
 class ExpireKeyThread extends Thread {
-  Map<String, String> dataStore;
-  String key;
-  long millis;
+  private Map<String, String> dataStore;
+  private String key;
+  private long millis;
 
   public ExpireKeyThread(String key, long millis, Map<String, String> dataStore) {
     this.key = key;
