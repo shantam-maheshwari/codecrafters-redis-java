@@ -130,7 +130,7 @@ class ClientHandlerThread extends Thread {
         // PING
         if (requestBulkStringData.equals("ping")) {
           // send simple string
-          responseSimpleStringData = "+PONG\r\n";
+          responseSimpleStringData = "PONG";
           writeResponseSimpleString(responseSimpleStringData, out);
         }
 
@@ -160,7 +160,7 @@ class ClientHandlerThread extends Thread {
           dataStore.put(key, value);
 
           // send simple string
-          responseSimpleStringData = "+OK\r\n";
+          responseSimpleStringData = "OK";
           writeResponseSimpleString(responseSimpleStringData, out);
 
           // SET PX
